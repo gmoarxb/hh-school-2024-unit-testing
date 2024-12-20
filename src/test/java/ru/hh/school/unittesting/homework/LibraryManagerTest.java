@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class LibraryManagerTest {
@@ -63,6 +65,7 @@ class LibraryManagerTest {
     when(userService.isUserActive(any())).thenReturn(false);
     boolean result = libraryManager.borrowBook("book1", "user1");
 
+    verify(notificationService, times(1)).notifyUser("user1", "Your account is not active.");
     assertFalse(result);
   }
 
@@ -71,6 +74,7 @@ class LibraryManagerTest {
     when(userService.isUserActive(any())).thenReturn(true);
     boolean result = libraryManager.borrowBook("book3", "user1");
 
+    verify(notificationService, times(0)).notifyUser("user1", "Your account is not active.");
     assertFalse(result);
   }
 
@@ -80,6 +84,8 @@ class LibraryManagerTest {
     int book1Quantity = libraryManager.getAvailableCopies("book1");
     boolean result = libraryManager.borrowBook("book1", "user1");
 
+    verify(notificationService, times(0)).notifyUser("user1", "Your account is not active.");
+    verify(notificationService, times(1)).notifyUser("user1", "You have borrowed the book: book1");
     assertTrue(result);
     assertEquals(book1Quantity - 1, libraryManager.getAvailableCopies("book1"));
   }
@@ -88,6 +94,7 @@ class LibraryManagerTest {
   void testReturnBookNotContainsKey() {
     boolean result = libraryManager.returnBook("book1", "user1");
 
+    verify(notificationService, times(0)).notifyUser("user1", "You have returned the book: book1");
     assertFalse(result);
   }
 
@@ -97,6 +104,7 @@ class LibraryManagerTest {
     libraryManager.borrowBook("book1", "user1");
     boolean result = libraryManager.returnBook("book1", "user2");
 
+    verify(notificationService, times(0)).notifyUser("user1", "You have returned the book: book1");
     assertFalse(result);
   }
 
@@ -107,6 +115,7 @@ class LibraryManagerTest {
     libraryManager.borrowBook("book1", "user1");
     boolean result = libraryManager.returnBook("book1", "user1");
 
+    verify(notificationService, times(1)).notifyUser("user1", "You have returned the book: book1");
     assertTrue(result);
     assertEquals(book1Quantity, libraryManager.getAvailableCopies("book1"));
   }
