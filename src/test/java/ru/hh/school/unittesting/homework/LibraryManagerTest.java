@@ -11,11 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LibraryManagerTest {
+class LibraryManagerTest {
 
   @Mock
   private NotificationService notificationService;
@@ -61,7 +63,7 @@ public class LibraryManagerTest {
     when(userService.isUserActive(any())).thenReturn(false);
     boolean result = libraryManager.borrowBook("book1", "user1");
 
-    assertEquals(false, result);
+    assertFalse(result);
   }
 
   @Test
@@ -69,7 +71,7 @@ public class LibraryManagerTest {
     when(userService.isUserActive(any())).thenReturn(true);
     boolean result = libraryManager.borrowBook("book3", "user1");
 
-    assertEquals(false, result);
+    assertFalse(result);
   }
 
   @Test
@@ -78,7 +80,7 @@ public class LibraryManagerTest {
     int book1Quantity = libraryManager.getAvailableCopies("book1");
     boolean result = libraryManager.borrowBook("book1", "user1");
 
-    assertEquals(true, result);
+    assertTrue(result);
     assertEquals(book1Quantity - 1, libraryManager.getAvailableCopies("book1"));
   }
 
@@ -86,7 +88,7 @@ public class LibraryManagerTest {
   void testReturnBookNotContainsKey() {
     boolean result = libraryManager.returnBook("book1", "user1");
 
-    assertEquals(false, result);
+    assertFalse(result);
   }
 
   @Test
@@ -95,7 +97,7 @@ public class LibraryManagerTest {
     libraryManager.borrowBook("book1", "user1");
     boolean result = libraryManager.returnBook("book1", "user2");
 
-    assertEquals(false, result);
+    assertFalse(result);
   }
 
   @Test
@@ -105,7 +107,7 @@ public class LibraryManagerTest {
     libraryManager.borrowBook("book1", "user1");
     boolean result = libraryManager.returnBook("book1", "user1");
 
-    assertEquals(true, result);
+    assertTrue(result);
     assertEquals(book1Quantity, libraryManager.getAvailableCopies("book1"));
   }
 
